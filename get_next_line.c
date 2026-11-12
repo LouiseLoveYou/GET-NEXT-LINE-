@@ -6,7 +6,7 @@
 /*   By: kisella <kisella@student.42lehavre.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/11 11:23:51 by kisella           #+#    #+#             */
-/*   Updated: 2026/11/11 16:45:29 by kisella          ###   ########.fr       */
+/*   Updated: 2026/11/12 13:33:32 by kisella          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,42 @@ static char	*extract_line(char *stock)
 	return (line);
 }
 
+static char	*updated_stock(char *stock)
+{
+	size_t	i;
+	size_t	j;
+	char	*str;
+
+	i = 0;
+	j = 0;
+	if (!stock)
+		return (NULL);
+	while (stock[i] && stock[i] != '\n')
+		i++;
+	if (!stock[i] || !stock[i + 1])
+		return (free(stock), NULL);
+	str = malloc(ft_strlen(stock) - i);
+	if (!str)
+		return (free(stock), NULL);
+	i++;
+	while (stock[i])
+		str[j++] = stock[i++];
+	str[j] = '\0';
+	free(stock);
+	return (str);
+}
+
 char	*get_next_line(int fd)
 {
+	char		*line;
+	static char	*stock;
+
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	stock = read_to_stock(fd, stock);
+	if (!stock)
+		return (NULL);
+	line = extract_line(stock);
+	stock = updated_stock(stock);
+	return (line);
 }
